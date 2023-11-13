@@ -1,5 +1,5 @@
 import sys
-sys.path.append("../../")
+sys.path.append("../")
 import math
 import time
 import torch
@@ -18,13 +18,13 @@ from models.bigbird_attention import big_bird_attention
 from training.get_init import get_x_init
 
 
-device = 'cuda'
+device = 'cpu'
 epochs = 50000
-lr=1e-3
-gd_steps = 5
+lr=1e-4
+gd_steps = 20
 
 d = 5
-MODEL_FILE='../saved_models/glase_unshared_d5_normalized_unbalanced_initx.pt'
+MODEL_FILE='../saved_models/glase_unshared_d5_normalized_unbalanced_initx_20steps.pt'
 TRAIN_DATA_FILE='../data/sbm5_neg_train.pkl'
 VAL_DATA_FILE='../data/sbm5_neg_train.pkl'
 
