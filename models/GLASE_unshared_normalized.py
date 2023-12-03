@@ -14,8 +14,9 @@ class GD_Block(MessagePassing):
     def forward(self, input, edge_index, edge_index_2, Q, mask):
         
         ## Apply mask
-        edge_index = (to_dense_adj(edge_index).squeeze(0)*to_dense_adj(mask).squeeze(0)).nonzero().t().contiguous()
-        edge_index_2 = (to_dense_adj(edge_index_2).squeeze(0)*to_dense_adj(mask).squeeze(0)).nonzero().t().contiguous() 
+        num_nodes = input.shape[0]
+        edge_index = (to_dense_adj(edge_index, max_num_nodes = num_nodes).squeeze(0)*to_dense_adj(mask, max_num_nodes = num_nodes).squeeze(0)).nonzero().t().contiguous()
+        edge_index_2 = (to_dense_adj(edge_index_2, max_num_nodes = num_nodes).squeeze(0)*to_dense_adj(mask, max_num_nodes = num_nodes).squeeze(0)).nonzero().t().contiguous() 
         
         ## Normalization parameters
         n = input.shape[0]

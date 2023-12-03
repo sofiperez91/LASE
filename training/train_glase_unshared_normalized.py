@@ -18,13 +18,13 @@ from models.bigbird_attention import big_bird_attention
 from training.get_init import get_x_init
 
 
-device = 'cpu'
+device = 'cuda'
 epochs = 50000
 lr=1e-4
-gd_steps = 20
+gd_steps = 5
 
 d = 5
-MODEL_FILE='../saved_models/glase_unshared_d5_normalized_unbalanced_initx_20steps.pt'
+MODEL_FILE='../saved_models/glase_unshared_d5_normalized_unbalanced_rand_5steps.pt'
 TRAIN_DATA_FILE='../data/sbm5_neg_train.pkl'
 VAL_DATA_FILE='../data/sbm5_neg_train.pkl'
 
@@ -85,7 +85,8 @@ for epoch in range(epochs):
     for i, batch in enumerate(train_loop):  
         batch.to(device) 
         optimizer.zero_grad()
-        x  = get_x_init(num_nodes, d, 0, math.pi/2, 0, math.pi/2).to(device)
+        x = torch.rand((num_nodes, d)).to(device)
+        # x  = get_x_init(num_nodes, d, 0, math.pi/2, 0, math.pi/2).to(device)
         out = model(x, batch.edge_index, edge_index_2, Q, mask)
         loss = torch.norm((out@Q@out.T - to_dense_adj(batch.edge_index).squeeze(0))*to_dense_adj(mask).squeeze(0))
         loss.backward() 
@@ -103,7 +104,8 @@ for epoch in range(epochs):
     val_loop = tqdm(val_loader)
     for i, batch in enumerate(val_loop):
         batch.to(device)       
-        x  = get_x_init(num_nodes, d,0, math.pi/2, 0, math.pi/2).to(device)
+        x = torch.rand((num_nodes, d)).to(device)
+        # x  = get_x_init(num_nodes, d,0, math.pi/2, 0, math.pi/2).to(device)
         out = model(x, batch.edge_index, edge_index_2, Q, mask)
         loss = torch.norm((out@Q@out.T - to_dense_adj(batch.edge_index).squeeze(0))*to_dense_adj(mask).squeeze(0))
 

@@ -19,12 +19,12 @@ from training.get_init import get_x_init
 
 
 device = 'cuda'
-epochs = 50000
-lr=1e-4
-gd_steps = 20
+epochs = 200
+lr=1e-3
+gd_steps = 5
 
 # d = 3
-# MODEL_FILE='../../saved_models/paper/lase_unshared_d3_normalized_unbalanced_random.pt'
+# MODEL_FILE='../saved_models/lase_unshared_d3_normalized_unbalanced_sim_random.pt'
 # TRAIN_DATA_FILE='../data/sbm3_sim_train.pkl'
 # VAL_DATA_FILE='../data/sbm3_sim_val.pkl'
 
@@ -33,9 +33,9 @@ gd_steps = 20
 # n = [50, 50, 50]
 
 # p = [
-#      [0.5, 0.1, 0.1],
-#      [0.1, 0.5, 0.1], 
-#      [0.1, 0.1, 0.5]
+#      [0.7, 0.1, 0.1],
+#      [0.1, 0.7, 0.1], 
+#      [0.1, 0.1, 0.7]
 # ]
 
 
@@ -49,28 +49,28 @@ gd_steps = 20
 #     [0.1, 0.2, 0.1, 0.2, 0.9],
 # ]
 
-d = 10
-MODEL_FILE='../saved_models/lase_unshared_d10_normalized_unbalanced_initx_20steps.pt'
-TRAIN_DATA_FILE='../data/sbm10_unbalanced_train.pkl'
-VAL_DATA_FILE='../data/sbm10_unbalanced_val.pkl'
+# d = 10
+# MODEL_FILE='../saved_models/lase_unshared_d10_normalized_unbalanced_initx_20steps.pt'
+# TRAIN_DATA_FILE='../data/sbm10_unbalanced_train.pkl'
+# VAL_DATA_FILE='../data/sbm10_unbalanced_val.pkl'
 
-num_nodes = 550
-n = [80, 50, 80, 40, 50, 60, 50, 50, 40, 50]
-p = [
-    [0.9, 0.1, 0.1, 0.3, 0.1, 0.1, 0.2, 0.1, 0.1, 0.1],
-    [0.1, 0.6, 0.3, 0.3, 0.2, 0.2, 0.1, 0.2, 0.3, 0.2],
-    [0.1, 0.3, 0.8, 0.2, 0.1, 0.3, 0.1, 0.1, 0.2, 0.2],
-    [0.3, 0.3, 0.2, 0.7, 0.3, 0.1, 0.3, 0.1, 0.3, 0.3],
-    [0.1, 0.2, 0.1, 0.3, 0.9, 0.1, 0.2, 0.1, 0.1, 0.2],
-    [0.1, 0.2, 0.3, 0.1, 0.1, 0.5, 0.2, 0.1, 0.1, 0.3],
-    [0.2, 0.1, 0.1, 0.3, 0.2, 0.2, 0.8, 0.2, 0.3, 0.1],
-    [0.1, 0.2, 0.1, 0.1, 0.1, 0.1, 0.2, 0.6, 0.1, 0.1],
-    [0.1, 0.3, 0.2, 0.3, 0.1, 0.1, 0.3, 0.1, 0.9, 0.1],
-    [0.1, 0.2, 0.2, 0.3, 0.2, 0.3, 0.1, 0.1, 0.1, 0.7],  
-]
+# num_nodes = 550
+# n = [80, 50, 80, 40, 50, 60, 50, 50, 40, 50]
+# p = [
+#     [0.9, 0.1, 0.1, 0.3, 0.1, 0.1, 0.2, 0.1, 0.1, 0.1],
+#     [0.1, 0.6, 0.3, 0.3, 0.2, 0.2, 0.1, 0.2, 0.3, 0.2],
+#     [0.1, 0.3, 0.8, 0.2, 0.1, 0.3, 0.1, 0.1, 0.2, 0.2],
+#     [0.3, 0.3, 0.2, 0.7, 0.3, 0.1, 0.3, 0.1, 0.3, 0.3],
+#     [0.1, 0.2, 0.1, 0.3, 0.9, 0.1, 0.2, 0.1, 0.1, 0.2],
+#     [0.1, 0.2, 0.3, 0.1, 0.1, 0.5, 0.2, 0.1, 0.1, 0.3],
+#     [0.2, 0.1, 0.1, 0.3, 0.2, 0.2, 0.8, 0.2, 0.3, 0.1],
+#     [0.1, 0.2, 0.1, 0.1, 0.1, 0.1, 0.2, 0.6, 0.1, 0.1],
+#     [0.1, 0.3, 0.2, 0.3, 0.1, 0.1, 0.3, 0.1, 0.9, 0.1],
+#     [0.1, 0.2, 0.2, 0.3, 0.2, 0.3, 0.1, 0.1, 0.1, 0.7],  
+# ]
 
 # d = 5
-# MODEL_FILE='../saved_models/lase_unshared_d5_normalized_unbalanced_xinit_10steps.pt'
+# MODEL_FILE='../saved_models/lase_unshared_d5_normalized_unbalanced_rand_20steps.pt'
 # TRAIN_DATA_FILE='../data/sbm5_unbalanced_train.pkl'
 # VAL_DATA_FILE='../data/sbm5_unbalanced_val.pkl'
 
@@ -85,11 +85,11 @@ p = [
 # ]
 
 # d = 3
-# MODEL_FILE='../saved_models/lase_unshared_d3_normalized_unbalanced_initx_10steps.pt'
+# MODEL_FILE='../saved_models/lase_unshared_d3_normalized_unbalanced_rand_20steps.pt'
 # TRAIN_DATA_FILE='../data/sbm3_unbalanced_train.pkl'
 # VAL_DATA_FILE='../data/sbm3_unbalanced_val.pkl'
 
-# num_nodes = 150
+# num_nodes = 150 
 # n = [70, 50, 30]
 
 # p = [
@@ -97,6 +97,20 @@ p = [
 #      [0.1, 0.9, 0.2], 
 #      [0.3, 0.2, 0.7]
 # ]
+
+d = 3
+MODEL_FILE='../saved_models/lase_unshared_d3_normalized_unbalanced_rand_v2_WS05.pt'
+TRAIN_DATA_FILE='../data/sbm3_train_2.pkl'
+VAL_DATA_FILE='../data/sbm3_val_2.pkl'
+
+num_nodes = 240
+n = [120, 80, 40]
+
+p = [
+     [0.9, 0.2, 0.1],
+     [0.2, 0.6, 0.2],
+     [0.1, 0.2, 0.7]
+]
 
 # d = 2
 # MODEL_FILE='../saved_models/lase_unshared_d2_normalized_unbalanced_rand.pt'
@@ -163,17 +177,22 @@ for epoch in range(epochs):
         batch.to(device) 
         optimizer.zero_grad()
         # x = torch.ones((num_nodes, d)).to(device)
-        # x = torch.rand((num_nodes, d)).to(device)
-        x  = get_x_init(num_nodes, d, 0, math.pi/2, 0, math.pi/2).to(device)
+        x = torch.rand((num_nodes, d)).to(device)
+        # x  = get_x_init(num_nodes, d, 0, math.pi/2, 0, math.pi/2).to(device)
         # ER05 = erdos_renyi_graph(num_nodes, 0.5, directed=False).to(device)
         # ER03 = erdos_renyi_graph(num_nodes, 0.3, directed=False).to(device)
         # ER01 = erdos_renyi_graph(num_nodes, 0.1, directed=False).to(device)
-        # WS = from_networkx(watts_strogatz_graph(num_nodes, 35, 0.9, seed=None)).edge_index.to(device)
+        WS05 = from_networkx(watts_strogatz_graph(num_nodes, 120, 0.1, seed=None)).edge_index.to(device)
+        # WS03 = from_networkx(watts_strogatz_graph(num_nodes, 72, 0.1, seed=None)).edge_index.to(device)
+        # WS01 = from_networkx(watts_strogatz_graph(num_nodes, 24, 0.1, seed=None)).edge_index.to(device)
+        # BB_05_01 = big_bird_attention(70, 0.05, 240).to(device)  
+        # BB_03_01 = big_bird_attention(30, 0.1, 240).to(device)
+        # BB_01_005 = big_bird_attention(6, 0.05, 240).to(device)
         # BB=big_bird_attention(5, 0.08, 350).to(device)
         # BB=big_bird_attention(10, 0.05, 350).to(device)
         # BB=big_bird_attention(15, 0.02, num_nodes).to(device)
         # BB=big_bird_attention(50, 0.05, num_nodes).to(device)
-        out = model(x, batch.edge_index, edge_index_2, mask)
+        out = model(x, batch.edge_index, WS05, mask)
         loss = torch.norm((out@out.T - to_dense_adj(batch.edge_index).squeeze(0))*to_dense_adj(mask).squeeze(0))
         loss.backward() 
         optimizer.step() 
@@ -181,6 +200,17 @@ for epoch in range(epochs):
         train_loss_step.append(loss.detach().to('cpu').numpy())
         train_loop.set_description(f"Epoch [{epoch}/{epochs}]")
         train_loop.set_postfix(loss=loss)
+        
+        
+        # Break if loss is NaN
+        if torch.isnan(loss):
+            print(loss)
+            break
+        
+    # Break if loss is NaN
+    if torch.isnan(loss):
+        print(loss)
+        break
 
     train_loss_epoch.append(np.array(train_loss_step).mean())
         
@@ -191,17 +221,22 @@ for epoch in range(epochs):
     for i, batch in enumerate(val_loop):
         batch.to(device)       
         # x = torch.ones((num_nodes, d)).to(device)
-        # x = torch.rand((num_nodes, d)).to(device)
-        x  = get_x_init(num_nodes, d,0, math.pi/2, 0, math.pi/2).to(device)
+        x = torch.rand((num_nodes, d)).to(device)
+        # x  = get_x_init(num_nodes, d,0, math.pi/2, 0, math.pi/2).to(device)
         # ER05 = erdos_renyi_graph(num_nodes, 0.5, directed=False).to(device)
         # ER03 = erdos_renyi_graph(num_nodes, 0.3, directed=False).to(device)
         # ER01 = erdos_renyi_graph(num_nodes, 0.1, directed=False).to(device)
-        # WS = from_networkx(watts_strogatz_graph(num_nodes, 35, 0.9, seed=None)).edge_index.to(device)
+        WS05 = from_networkx(watts_strogatz_graph(num_nodes, 120, 0.1, seed=None)).edge_index.to(device)
+        # WS03 = from_networkx(watts_strogatz_graph(num_nodes, 72, 0.1, seed=None)).edge_index.to(device)
+        # WS01 = from_networkx(watts_strogatz_graph(num_nodes, 24, 0.1, seed=None)).edge_index.to(device)
+        # BB_05_01 = big_bird_attention(70, 0.05, 240).to(device) 
+        # BB_03_01 = big_bird_attention(30, 0.1, 240).to(device)
+        # BB_01_005 = big_bird_attention(6, 0.05, 240).to(device)
         # BB=big_bird_attention(5, 0.08, 350).to(device)
         # BB=big_bird_attention(10, 0.05, 350).to(device)
         # BB=big_bird_attention(15, 0.02, num_nodes).to(device)
         # BB=big_bird_attention(50, 0.05, num_nodes).to(device)
-        out = model(x, batch.edge_index, edge_index_2, mask)
+        out = model(x, batch.edge_index, WS05, mask)
         loss = torch.norm((out@out.T - to_dense_adj(batch.edge_index).squeeze(0))*to_dense_adj(mask).squeeze(0))
 
         val_loss_step.append(loss.detach().to('cpu').numpy())
@@ -209,6 +244,7 @@ for epoch in range(epochs):
         val_loop.set_postfix(loss=loss)
 
     val_loss_epoch.append(np.array(val_loss_step).mean())
+    
 
     if val_loss_epoch[epoch] < min_val_loss:
         torch.save(model.state_dict(), MODEL_FILE)
