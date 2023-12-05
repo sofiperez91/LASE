@@ -13,26 +13,29 @@ import time
 import math
 from training.get_init import get_x_init
 from graspologic.embed import AdjacencySpectralEmbed 
+from scipy.stats import sem
 
 
 parser = argparse.ArgumentParser(description='Classifier')
-parser.add_argument('--dataset', type=str, default='cora', help='[cora, amazon, chameleon]')
+parser.add_argument('--dataset', type=str, default='cora', help='[cora, amazon, chameleon, squirrel]')
+parser.add_argument('--mask', type=str, default='FULL', help='[ER08, ER06, ER04, ER02]')
 
 
 args = parser.parse_args()
 dataset = args.dataset
+mask = args.mask
     
 
 GLASE_EMBEDDINGS=f'../saved_models/glase_unshared_{dataset}_5steps.pt'
 Q_FILE = f'../data/{dataset}_q.pkl'
 DATASET_FILE = f'../data/{dataset}_dataset.pkl'
-MODEL_FILE_GLASE = f'../saved_models/glase_{dataset}_classifier_GAT_GLASE_ER02.pt'
-MODEL_FILE_ASE = f'../saved_models/glase_{dataset}_classifier_GAT_ASE_ER02.pt'
-MODEL_FILE_FEAT = f'../saved_models/glase_{dataset}_classifier_GAT_FEAT_ER02.pt'
-MASK_FILE = f'../data/{dataset}_mask_ER02.pkl'
-GLASE_RESULTS = f'./results/glase_{dataset}_GAT_results_ER02.pkl'
-ASE_RESULTS = f'./results/ase_{dataset}_GAT_results_ER02.pkl'
-FEATURE_RESULTS = f'./results/feat_{dataset}_GAT_results_ER02.pkl'
+MODEL_FILE_GLASE = f'../saved_models/glase_{dataset}_classifier_GAT_GLASE_{mask}.pt'
+MODEL_FILE_ASE = f'../saved_models/glase_{dataset}_classifier_GAT_ASE_{mask}.pt'
+MODEL_FILE_FEAT = f'../saved_models/glase_{dataset}_classifier_GAT_FEAT_{mask}.pt'
+MASK_FILE = f'../data/{dataset}_mask_{mask}.pkl'
+GLASE_RESULTS = f'./results/glase_{dataset}_GAT_results_{mask}.pkl'
+ASE_RESULTS = f'./results/ase_{dataset}_GAT_results_{mask}.pkl'
+FEATURE_RESULTS = f'./results/feat_{dataset}_GAT_results_{mask}.pkl'
 
 ## LOAD DATASET 
 with open(DATASET_FILE, 'rb') as f:
@@ -400,7 +403,8 @@ for iter in range(10):
 with open(GLASE_RESULTS, 'wb') as f:
     pickle.dump(acc_glase_test, f)
 
-print(f'{np.array(acc_feat_test).mean()*100} +/- {np.array(acc_feat_test).std()*100}')
-print(f'{np.array(acc_ase_test).mean()*100} +/- {np.array(acc_ase_test).std()*100}')
-print(f'{np.array(acc_glase_test).mean()*100} +/- {np.array(acc_glase_test).std()*100}')
+
+print(f'{np.array(acc_feat_test).mean()*100} +/- {sem(np.array(acc_feat_test))*100}')
+print(f'{np.array(acc_ase_test).mean()*100} +/- {sem(np.array(acc_ase_test))*100}')
+print(f'{np.array(acc_glase_test).mean()*100} +/- {sem(np.array(acc_glase_test))*100}')
 

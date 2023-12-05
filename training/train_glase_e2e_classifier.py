@@ -16,16 +16,18 @@ from networkx import watts_strogatz_graph
 
 parser = argparse.ArgumentParser(description='Classifier')
 parser.add_argument('--dataset', type=str, default='cora', help='[cora, amazon, chameleon]')
+parser.add_argument('--mask', type=str, default='ER08', help='[cora, amazon, chameleon]')
 
 args = parser.parse_args()
 dataset = args.dataset
+mask = args.mask
     
 
 Q_FILE = f'../data/{dataset}_q.pkl'
 DATASET_FILE = f'../data/{dataset}_dataset.pkl'
-GLASE_MODEL_FILE=f'../saved_models/glase_unshared_{dataset}_e2e_ER02_v2.pt'
-MASK_FILE = f'../data/{dataset}_mask_ER02.pkl'
-E2E_RESULTS = f'./results/glase_{dataset}_results_e2e_ER02_v2.pkl'
+GLASE_MODEL_FILE=f'../saved_models/glase_unshared_{dataset}_e2e_{mask}_v2.pt'
+MASK_FILE = f'../data/{dataset}_mask_{mask}.pkl'
+E2E_RESULTS = f'./results/glase_{dataset}_results_e2e_{mask}_v2.pkl'
 
 
 ## LOAD DATASET 
@@ -72,9 +74,8 @@ data.to(device)
 
 num_nodes = data.num_nodes
 Q = torch.diag(q).to(device)
-# edge_index_2 = torch.ones([num_nodes,num_nodes],).nonzero().t().contiguous().to(device)
-edge_index_2 =  from_networkx(watts_strogatz_graph(num_nodes, 700, 0.1, seed=None)).edge_index.to(device)
-# mask = (torch.ones([num_nodes,num_nodes],)-torch.eye(num_nodes)).nonzero().t().contiguous().to(device)
+edge_index_2 = torch.ones([num_nodes,num_nodes],).nonzero().t().contiguous().to(device)
+# edge_index_2 =  from_networkx(watts_strogatz_graph(num_nodes, 700, 0.1, seed=None)).edge_index.to(device)
 with open(MASK_FILE, 'rb') as f:
     mask = pickle.load(f)
 mask = mask.to(device)

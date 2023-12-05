@@ -99,6 +99,12 @@ with open(DATASET_FILE, 'wb') as f:
 
 # MASKS
 torch.manual_seed(42)
+
+
+mask = (torch.ones([num_nodes,num_nodes],)-torch.eye(num_nodes)).nonzero().t().contiguous()
+with open('./amazon_mask_FULL.pkl', 'wb') as f:
+    pickle.dump(mask,f)
+
 ER08 = erdos_renyi_graph(num_nodes, 0.8, directed=False)
 ER06 = erdos_renyi_graph(num_nodes, 0.6, directed=False)
 ER04 = erdos_renyi_graph(num_nodes, 0.4, directed=False)

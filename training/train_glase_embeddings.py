@@ -16,10 +16,10 @@ import math
 from training.get_init import get_x_init
 
 
-MODEL_FILE='../saved_models/glase_unshared_amazon_5steps.pt'
-TRAIN_DATA_FILE = '../data/amazon_train_subgraphs.pkl'
-VAL_DATA_FILE = '../data/amazon_val_subgraphs.pkl'
-q_file = '../data/amazon_q.pkl'
+MODEL_FILE='../saved_models/glase_unshared_squirrel_5steps.pt'
+TRAIN_DATA_FILE = '../data/squirrel_train_subgraphs.pkl'
+VAL_DATA_FILE = '../data/squirrel_val_subgraphs.pkl'
+q_file = '../data/squirrel_q.pkl'
 
 
 ## Load data
@@ -36,7 +36,7 @@ with open(q_file, 'rb') as f:
 train_loader = DataLoader(df_train, batch_size=1, shuffle = True)
 val_loader = DataLoader(df_val, batch_size=1, shuffle = False)   
 
-d = 8
+d = 5
 device = 'cuda'
 gd_steps = 5
 epochs = 10000
