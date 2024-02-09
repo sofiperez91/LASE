@@ -17,7 +17,7 @@ from scipy.stats import sem
 
 
 parser = argparse.ArgumentParser(description='Classifier')
-parser.add_argument('--dataset', type=str, default='cora', help='[cora, amazon, chameleon, squirrel]')
+parser.add_argument('--dataset', type=str, default='cora', help='[cora, amazon, chameleon, squirrel, cornell]')
 parser.add_argument('--mask', type=str, default='FULL', help='[ER08, ER06, ER04, ER02]')
 
 
@@ -69,8 +69,8 @@ x_glase = glase_model(x, data.edge_index, edge_index_2, Q, mask)
 x_glase = x_glase.detach()
 
 ## ASE EMBEDDINGS
-adj_matrix = to_dense_adj(data.edge_index.to('cpu')).squeeze(0)
-mask_matrix = to_dense_adj(mask).squeeze(0)
+adj_matrix = to_dense_adj(data.edge_index.to('cpu'), max_num_nodes = num_nodes).squeeze(0)
+mask_matrix = to_dense_adj(mask, max_num_nodes = num_nodes).squeeze(0)
 masked_adj = adj_matrix*mask_matrix
 ase = AdjacencySpectralEmbed(n_components=d, diag_aug=True, algorithm='full')
 x_ase = ase.fit_transform(masked_adj.numpy())

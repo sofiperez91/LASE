@@ -165,3 +165,5 @@ local/
 *.pkl
 data/dataset/*
 *.txt
+
+notebooks/data/Cora/*

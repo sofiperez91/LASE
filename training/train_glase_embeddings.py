@@ -15,11 +15,11 @@ import time
 import math
 from training.get_init import get_x_init
 
-
-MODEL_FILE='../saved_models/glase_unshared_squirrel_5steps.pt'
-TRAIN_DATA_FILE = '../data/squirrel_train_subgraphs.pkl'
-VAL_DATA_FILE = '../data/squirrel_val_subgraphs.pkl'
-q_file = '../data/squirrel_q.pkl'
+dataset = "wisconsin"
+MODEL_FILE=f'../saved_models/glase_unshared_{dataset}_5steps.pt'
+TRAIN_DATA_FILE = f'../data/{dataset}_train_subgraphs.pkl'
+VAL_DATA_FILE = f'../data/{dataset}_val_subgraphs.pkl'
+q_file = f'../data/{dataset}_q.pkl'
 
 
 ## Load data

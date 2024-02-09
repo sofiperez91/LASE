@@ -6,7 +6,10 @@ import torch
 import numpy as np
 import torch_geometric as pyg
 from torch_geometric.utils import stochastic_blockmodel_graph, to_dense_adj, erdos_renyi_graph
-from models.GLASE_unshared_normalized import gLASE 
+# from models.GLASE_unshared_normalized import gLASE 
+
+from models.GLASE_unshared_normalized_v2 import gLASE_v2 
+
 from models.early_stopper import EarlyStopper
 from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
@@ -24,25 +27,25 @@ lr=1e-3
 gd_steps = 10
 
 
-d = 5
-MODEL_FILE='../saved_models/lase_unshared_normalized_unbalanced_bipartite_xase_10steps.pt'
-TRAIN_DATA_FILE='../data/bipartite_train.pkl'
-VAL_DATA_FILE='../data/bipartite_val.pkl'
+d = 4
+MODEL_FILE='../saved_models/lase_unshared_normalized_unbalanced_bipartite_xase_d4_10steps.pt'
+TRAIN_DATA_FILE='../data/bipartite_d4_train.pkl'
+VAL_DATA_FILE='../data/bipartite_d4_val.pkl'
 
 num_nodes = 330
 
-q = torch.Tensor([ 1.,  1., -1., -1., -1.])
+q = torch.Tensor([ 1.,  -1., -1., 1.])
 Q=torch.diag(q).to(device)
 print('Q=',Q)
 
 
-model = gLASE(d,d, gd_steps)
+model = gLASE_v2(d,d, gd_steps)
 model.to(device)
 
 ## Initialization
 for step in range(gd_steps):
     model.gd[step].lin1.weight.data = torch.nn.init.xavier_uniform_(model.gd[step].lin1.weight)*lr
-    model.gd[step].lin2.weight.data = torch.nn.init.xavier_uniform_(model.gd[step].lin2.weight)*lr
+    # model.gd[step].lin2.weight.data = torch.nn.init.xavier_uniform_(model.gd[step].lin2.weight)*lr
     
 
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)

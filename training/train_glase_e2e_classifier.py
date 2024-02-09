@@ -16,7 +16,7 @@ from networkx import watts_strogatz_graph
 
 parser = argparse.ArgumentParser(description='Classifier')
 parser.add_argument('--dataset', type=str, default='cora', help='[cora, amazon, chameleon]')
-parser.add_argument('--mask', type=str, default='ER08', help='[cora, amazon, chameleon]')
+parser.add_argument('--mask', type=str, default='FULL', help='[cora, amazon, chameleon]')
 
 args = parser.parse_args()
 dataset = args.dataset

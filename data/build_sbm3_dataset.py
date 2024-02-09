@@ -37,10 +37,10 @@ device = 'cpu'
 
 
 ## DEFINE BIPARTITE GRAPH
-TRAIN_DATA_FILE='./bipartite_train.pkl'
-VAL_DATA_FILE='./bipartite_val.pkl'
+TRAIN_DATA_FILE='./bipartite_d6_train.pkl'
+VAL_DATA_FILE='./bipartite_d6_val.pkl'
 
-d = 5
+d = 6
 n_P1 = 50
 n_P2 = 50
 n_L1 = 100
@@ -64,6 +64,16 @@ p = [
     ]
 
 n = [n_P1, n_P2, n_L1, n_L2, n_L3]
+
+# p = [
+#     [0, 0, P1_L1, P1_L2],
+#     [0, 0, P2_L1, P2_L2],
+#     [P1_L1, P2_L1, 0, 0], 
+#     [P1_L2, P2_L2, 0, 0]
+#     ]
+
+# n = [n_P1, n_P2, n_L1, n_L2]
+
 num_nodes = np.sum(n)
 
 edge_index = stochastic_blockmodel_graph(n, p).to(device)
