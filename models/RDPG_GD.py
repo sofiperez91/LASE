@@ -107,7 +107,7 @@ def coordinate_descent(edge_index, M, d, device='cpu', X=None, tol=1e-5):
 
 
 def GRDPG_GD_Armijo(x, edge_index, Q, M, max_iter=100, tol=1e-3, b=0.3, sigma=0.1, t=0.1, verbose=False):
-    A = to_dense_adj(edge_index).squeeze()
+    A = to_dense_adj(edge_index, max_num_nodes=x.shape[0]).squeeze()
     b=0.3; sigma=0.1 # Armijo parameters
     t = 0.1
     xd=x
