@@ -167,3 +167,8 @@ data/dataset/*
 *.txt
 
 notebooks/data/Cora/*
+*.csv
+*.pickle
+*.pt
+*.code-workspace
+*.index

@@ -19,33 +19,33 @@ epochs = 50000
 lr=1e-3
 K=3
 
-# d = 3
-# MODEL_FILE='../../saved_models/paper/gcn_d3.pt'
-# TRAIN_DATA_FILE='../data/sbm3_unbalanced_train.pkl'
-# VAL_DATA_FILE='../data/sbm3_unbalanced_val.pkl'
-
-# num_nodes = 150
-# n = [70, 50, 30]
-
-# p = [
-#      [0.5, 0.1, 0.3],
-#      [0.1, 0.9, 0.2], 
-#      [0.3, 0.2, 0.7]
-# ]
-
 d = 3
-MODEL_FILE='../saved_models/gcn_d3_sim_random.pt'
-TRAIN_DATA_FILE='../data/sbm3_sim_train.pkl'
-VAL_DATA_FILE='../data/sbm3_sim_val.pkl'
+MODEL_FILE='../saved_models/gcn_d3.pt'
+TRAIN_DATA_FILE='../data/sbm3_unbalanced_train.pkl'
+VAL_DATA_FILE='../data/sbm3_unbalanced_val.pkl'
 
 num_nodes = 150
-n = [50, 50, 50]
+n = [70, 50, 30]
 
 p = [
-     [0.7, 0.1, 0.1],
-     [0.1, 0.7, 0.1], 
-     [0.1, 0.1, 0.7]
+     [0.5, 0.1, 0.3],
+     [0.1, 0.9, 0.2], 
+     [0.3, 0.2, 0.7]
 ]
+
+# d = 3
+# MODEL_FILE='../saved_models/gcn_d3_sim_random.pt'
+# TRAIN_DATA_FILE='../data/sbm3_sim_train.pkl'
+# VAL_DATA_FILE='../data/sbm3_sim_val.pkl'
+
+# num_nodes = 150
+# n = [50, 50, 50]
+
+# p = [
+#      [0.7, 0.1, 0.1],
+#      [0.1, 0.7, 0.1], 
+#      [0.1, 0.1, 0.7]
+# ]
 
 
 model = GCN(d,d, K)
