@@ -3,13 +3,16 @@ from torch import nn
 from torch_geometric.nn import GCNConv
 from torch_geometric.nn import TransformerConv
 from models.GraphTransformerLayer import GraphTransformerLayer
-from models.GAT import GATv2
+from models.GAT import GATv2, GraphTransformer
 from sklearn.metrics import roc_auc_score
 from torch_geometric.utils import negative_sampling
 from torch_geometric.utils import to_dense_adj
 from torch_geometric.utils import to_dgl
 import copy
 from torch_geometric.data import Data
+from torch.nn import ReLU
+import torch.nn.functional as F
+from torch_geometric.nn import Sequential
 
 
 class Net(torch.nn.Module):
@@ -66,12 +69,20 @@ class GATLinkPrediction(torch.nn.Module):
     
     
 class TransformerLinkPrediction(torch.nn.Module):
-    def __init__(self, in_channels, hidden_channels, out_channels, n_layers, dropout, num_heads):
+    def __init__(self, in_channels, hidden_channels, out_channels, pe_dim_in, pe_dim_out, n_layers, dropout, num_heads):
         super().__init__()
-        self.gat = TransformerConv(in_channels, out_channels, heads=num_heads, bias = True) # concat features + embeddings
+        self.feat_lin = nn.Linear(in_channels, hidden_channels, bias=True)
+        self.pe_lin = nn.Linear(pe_dim_in, pe_dim_out, bias=True)        
+        self.transformer = GraphTransformer(hidden_channels+pe_dim_out, hidden_channels, out_channels, n_layers, dropout, num_heads) # concat features + embeddings
 
-    def encode(self, x, edge_index):
-        x = self.gat(x, edge_index)
+    #     self.gat = TransformerConv(in_channels, out_channels, heads=num_heads, bias = True) # concat features + embeddings
+
+    def encode(self, x_in, edge_index):
+        x_feat, x_pe = x_in
+        x_pe = self.pe_lin(x_pe)
+        x_feat=self.feat_lin(x_feat)
+        x = torch.concatenate((x_feat, x_pe), axis=1)
+        x = self.transformer(x, edge_index)
         return x
 
     def decode(self, z, edge_label_index):
@@ -80,38 +91,17 @@ class TransformerLinkPrediction(torch.nn.Module):
     def decode_all(self, z):
         prob_adj = z @ z.t()
         return (prob_adj > 0).nonzero(as_tuple=False).t()
-    
-    
-# class GraphTransformerLinkPrediction(torch.nn.Module):
-#     def __init__(self, in_channels, hidden_channels, out_channels, n_layers, dropout, num_heads):
-#         super().__init__()
-#         self.layers = nn.ModuleList()
-        
-#         self.layers.append(GraphTransformerLayer(in_channels, hidden_channels, num_heads, dropout, residual=False))
-#         for _ in range(n_layers - 2):
-#             self.layers.append(GraphTransformerLayer(hidden_channels, hidden_channels, num_heads,
-#                                                 dropout))
-#         self.layers.append(GraphTransformerLayer(hidden_channels, out_channels, num_heads, dropout))
-        
 
-#     def encode(self, x, edge_index):
-#         data = Data(x=x, edge_index=edge_index)
-#         # Transform to DGL
-#         g = to_dgl(data) 
-        
-#         # GraphTransformer Layers
-#         for conv in self.layers:
-#             x = conv(g, x)
 
-#         return x
+
 
 class GraphTransformerLinkPrediction(torch.nn.Module):
-    def __init__(self, in_channels, out_channels, pe_dim_in, pe_dim_out, n_layers, dropout, num_heads):
+    def __init__(self, in_channels, out_channels, pe_dim_in, pe_dim_out, n_layers, dropout, num_heads, batch_norm: bool = True):
         super().__init__()
         
         self.feat_lin = nn.Linear(in_channels, out_channels, bias=True)
         self.pe_lin = nn.Linear(pe_dim_in, pe_dim_out, bias=True)
-        self.layers = nn.ModuleList([GraphTransformerLayer(out_channels+pe_dim_out, out_channels+pe_dim_out, num_heads, dropout) for _ in range(n_layers)])
+        self.layers = nn.ModuleList([GraphTransformerLayer(out_channels+pe_dim_out, out_channels+pe_dim_out, num_heads, dropout, batch_norm=batch_norm) for _ in range(n_layers)])
         
 
     def encode(self, x_in, edge_index):
@@ -128,8 +118,6 @@ class GraphTransformerLinkPrediction(torch.nn.Module):
             x = conv(g, x)
 
         return x
-
-
 
     def decode(self, z, edge_label_index):
         return (z[edge_label_index[0]] * z[edge_label_index[1]]).sum(dim=-1)
@@ -186,7 +174,7 @@ def train_link_prediction(x_train, x_val, x_test, train_data, val_data, test_dat
             final_test_auc = test_auc
     return model
 
-def train_link_prediction_GAT(x_train, x_val, x_test, train_data, val_data, test_data, input_dim, epochs = 101): 
+def train_link_prediction_GAT(x_train, x_val, x_test, train_data, val_data, test_data, input_dim, epochs = 301): 
     device = "cuda"
     model = GATLinkPrediction(input_dim, 128, 64, n_layers=3, dropout=0.5, num_heads=1).to(device)
     optimizer = torch.optim.Adam(params=model.parameters(), lr=0.01)
@@ -201,9 +189,9 @@ def train_link_prediction_GAT(x_train, x_val, x_test, train_data, val_data, test
             final_test_auc = test_auc
     return model
 
-def train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim, epochs = 101): 
+def train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim, pe_dim, epochs = 301): 
     device = "cuda"
-    model = TransformerLinkPrediction(input_dim, 128, 64, n_layers=3, dropout=0.5, num_heads=2).to(device)
+    model = TransformerLinkPrediction(input_dim, 64, 32, pe_dim, 8, n_layers=3, dropout=0.5, num_heads=4).to(device)
     optimizer = torch.optim.Adam(params=model.parameters(), lr=0.01)
     criterion = torch.nn.BCEWithLogitsLoss()
     best_val_auc = final_test_auc = 0
@@ -216,10 +204,12 @@ def train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_da
             final_test_auc = test_auc
     return model
 
-def train_link_prediction_GraphTransformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim, pe_dim,  epochs = 301): 
+def train_link_prediction_GraphTransformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim, pe_dim, epochs = 301, 
+                                           output_dim: int = 32, pe_out_dim: int = 8, n_layers: int = 3, dropout:int =0.5, num_heads: int =4, batch_norm: bool = True, lr: int = 0.01): 
     device = "cuda"
-    model = GraphTransformerLinkPrediction(input_dim, 32, pe_dim, 8, n_layers=3, dropout=0.5, num_heads=4).to(device)
-    optimizer = torch.optim.Adam(params=model.parameters(), lr=0.01)
+    model = GraphTransformerLinkPrediction(input_dim, output_dim, pe_dim, pe_out_dim, n_layers=n_layers, dropout=dropout, num_heads=num_heads, batch_norm=batch_norm).to(device)
+    
+    optimizer = torch.optim.Adam(params=model.parameters(), lr=lr)
     criterion = torch.nn.BCEWithLogitsLoss()
     best_val_auc = final_test_auc = 0
     for epoch in range(1, epochs):

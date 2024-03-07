@@ -1,12 +1,15 @@
 import sys
 sys.path.append("../")
 
+import warnings
+warnings.filterwarnings("ignore")
+
 import argparse
 import torch
 import torch.nn as nn
 import numpy as np
 from torch_geometric.utils import to_dense_adj
-from models.glase_classifier import glaseClassifierGAT, FeatureClassifierGAT
+from models.glase_classifier import glaseClassifierGAT, FeatureClassifierGAT, glaseClassifierTransformer
 from models.GLASE_unshared_normalized import gLASE
 import pickle
 import time
@@ -17,8 +20,8 @@ from scipy.stats import sem
 
 
 parser = argparse.ArgumentParser(description='Classifier')
-parser.add_argument('--dataset', type=str, default='cora', help='[cora, amazon, chameleon, squirrel, cornell]')
-parser.add_argument('--mask', type=str, default='FULL', help='[ER08, ER06, ER04, ER02]')
+parser.add_argument('--dataset', type=str, default='cora', help='[cora, citeseer, amazon, chameleon, squirrel, cornell]')
+parser.add_argument('--mask', type=str, default='FULL', help='M08, ER06, ER04, ER02]')
 
 
 args = parser.parse_args()
@@ -37,19 +40,41 @@ GLASE_RESULTS = f'./results/glase_{dataset}_GAT_results_{mask}.pkl'
 ASE_RESULTS = f'./results/ase_{dataset}_GAT_results_{mask}.pkl'
 FEATURE_RESULTS = f'./results/feat_{dataset}_GAT_results_{mask}.pkl'
 
+device = 'cuda'
+
 ## LOAD DATASET 
 with open(DATASET_FILE, 'rb') as f:
     data = pickle.load(f)
 
+data = data.to(device)
 print(data)
 
 ## GENERATE EMBEDDINGS
 d = torch.unique(data.y).shape[0]
 print(d)
 gd_steps = 5
-device = 'cpu'
-
 num_nodes = data.num_nodes
+
+with open(Q_FILE, 'rb') as f:
+    q = pickle.load(f)
+
+Q = torch.diag(q).to(device)
+edge_index_2 = torch.ones([num_nodes,num_nodes],).nonzero().t().contiguous().to(device)
+# mask = (torch.ones([num_nodes,num_nodes],)-torch.eye(num_nodes)).nonzero().t().contiguous().to(device)
+with open(MASK_FILE, 'rb') as f:
+    mask = pickle.load(f)
+mask = mask.to(device)
+
+## ASE EMBEDDINGS
+adj_matrix = to_dense_adj(data.edge_index, max_num_nodes = num_nodes).squeeze(0)
+mask_matrix = to_dense_adj(mask, max_num_nodes = num_nodes).squeeze(0)
+masked_adj = (adj_matrix*mask_matrix).to('cpu')
+ase = AdjacencySpectralEmbed(n_components=d, diag_aug=True, algorithm='full')
+x_ase = ase.fit_transform(masked_adj.numpy())
+x_ase = torch.from_numpy(x_ase).to(device)
+
+# print(x_ase)
+
 
 glase_model = gLASE(d,d, gd_steps)
 glase_model.load_state_dict(torch.load(GLASE_EMBEDDINGS))
@@ -57,24 +82,13 @@ glase_model.to(device)
 
 with open(Q_FILE, 'rb') as f:
     q = pickle.load(f)
-
 Q = torch.diag(q).to(device)
-edge_index_2 = torch.ones([num_nodes,num_nodes],).nonzero().t().contiguous()
-mask = (torch.ones([num_nodes,num_nodes],)-torch.eye(num_nodes)).nonzero().t().contiguous().to(device)
-with open(MASK_FILE, 'rb') as f:
-    mask = pickle.load(f)
 
-x = get_x_init(num_nodes, d, 0, math.pi/2, 0, math.pi/2).to(device)
-x_glase = glase_model(x, data.edge_index, edge_index_2, Q, mask)
+# # x = get_x_init(num_nodes, d, 0, math.pi/2, 0, math.pi/2).to(device)
+x_glase = glase_model(x_ase, data.edge_index, edge_index_2, Q, mask)
 x_glase = x_glase.detach()
+x_glase=x_glase.to(device)
 
-## ASE EMBEDDINGS
-adj_matrix = to_dense_adj(data.edge_index.to('cpu'), max_num_nodes = num_nodes).squeeze(0)
-mask_matrix = to_dense_adj(mask, max_num_nodes = num_nodes).squeeze(0)
-masked_adj = adj_matrix*mask_matrix
-ase = AdjacencySpectralEmbed(n_components=d, diag_aug=True, algorithm='full')
-x_ase = ase.fit_transform(masked_adj.numpy())
-x_ase = torch.from_numpy(x_ase)
 
 edge_index = masked_adj.nonzero().t().contiguous().to(device)
 
@@ -82,12 +96,12 @@ edge_index = masked_adj.nonzero().t().contiguous().to(device)
 feature_dim = data.x.shape[1] # dimensionality of the word embeddings
 embedding_dim = d  # dimensionality of the graph embeddings
 hidden_dim = 32  # number of hidden units
-h_embedding_dim = 32  ## TODO: SACAR
+h_embedding_dim = 32
 output_dim = d  # number of classes
 n_layers = 3
 dropout1 = 0.5
-dropout2 = 0.5 ## TODO: SACAR
-device = 'cpu'
+dropout2 = 0.5 
+device = 'cuda'
 epochs = 1000
 lr=1e-2
 
@@ -95,9 +109,9 @@ lr=1e-2
 ## FEATURES
 acc_feat_test = []
 for iter in range(10):
-    train_index = data.train_idx[:,iter]
-    val_index = data.val_idx[:,iter]
-    test_index = data.test_idx[:,iter]
+    train_index = data.train_idx[:,iter].to(device)
+    val_index = data.val_idx[:,iter].to(device)
+    test_index = data.test_idx[:,iter].to(device)
 
     # model = FeatureClassifier(feature_dim, hidden_dim,output_dim, n_layers, dropout1, dropout2)
     model = FeatureClassifierGAT(feature_dim, hidden_dim,output_dim, n_layers, dropout1, dropout2, num_heads=1)
@@ -207,6 +221,7 @@ for iter in range(10):
     test_index = data.test_idx[:,iter]
     
     model = glaseClassifierGAT(feature_dim, embedding_dim, hidden_dim, h_embedding_dim,output_dim, n_layers, dropout1, dropout2, num_heads=1)
+    # model = glaseClassifierTransformer(feature_dim, embedding_dim, hidden_dim, h_embedding_dim, output_dim, n_layers, dropout1, dropout2, num_heads=1)
     model.to(device)    
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -310,6 +325,7 @@ for iter in range(10):
     test_index = data.test_idx[:,iter]
     
     model = glaseClassifierGAT(feature_dim, embedding_dim, hidden_dim, h_embedding_dim,output_dim, n_layers, dropout1, dropout2, num_heads=1)
+    # model = glaseClassifierTransformer(feature_dim, embedding_dim, hidden_dim, h_embedding_dim,output_dim, n_layers, dropout1, dropout2, num_heads=1)
     model.to(device)    
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)

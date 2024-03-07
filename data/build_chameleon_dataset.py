@@ -7,9 +7,9 @@ import random
 from torch_geometric.utils import to_dense_adj, erdos_renyi_graph, dropout_node, to_networkx, from_networkx
 from torch_geometric.data import Data
 import pickle
-from torch_geometric.datasets import WikipediaNetwork, WebKB
+from torch_geometric.datasets import WikipediaNetwork, WebKB, Planetoid
 
-dataset_name = "texas"
+dataset_name = "citeseer"
 
 Q_FILE = f'{dataset_name}_q.pkl'
 SUBGRAPH_TRAIN_FILE = f'./{dataset_name}_train_subgraphs.pkl'
@@ -44,7 +44,8 @@ DATASET_FILE = f'./{dataset_name}_dataset.pkl'
 
 # LOAD ORIGINAL GRAPH
 # dataset = WikipediaNetwork(root='./dataset/Chameleon', name='chameleon')
-dataset = WebKB(root=f'./dataset/{dataset_name}', name=f'{dataset_name}')
+# dataset = WebKB(root=f'./dataset/{dataset_name}', name=f'{dataset_name}')
+dataset = Planetoid(root='./dataset/CiteSeer', name='CiteSeer', split='public', transform=None)
 data = dataset[0]
 num_nodes = data.y.shape[0]
 

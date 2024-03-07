@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch_geometric.nn import GCNConv
 from torch_geometric.nn import TransformerConv
-from models.GAT import GATv2
+from models.GAT import GATv2, GraphTransformer
 from models.GraphTransformerLayer import GraphTransformerLayer
 from sklearn.metrics import roc_auc_score
 from torch_geometric.utils import negative_sampling
@@ -42,7 +42,7 @@ class GLASELinkPrediction(torch.nn.Module):
 
 class GLASELinkPredictionGAT(torch.nn.Module):
     def __init__(self, in_channels, emb_in, hidden_channels, out_channels, gd_steps, n_layers, dropout, num_heads):
-        super().__init__()
+        super().__init__()     
         self.gd_steps = gd_steps
         self.gat = GATv2(in_channels+emb_in, hidden_channels, out_channels, n_layers, dropout, num_heads) # concat features + embeddings
         layers = []
@@ -65,21 +65,27 @@ class GLASELinkPredictionGAT(torch.nn.Module):
         return (prob_adj > 0).nonzero(as_tuple=False).t()
     
 class GLASELinkPredictionTransformer(torch.nn.Module):
-    def __init__(self, in_channels, emb_in, hidden_channels, out_channels, gd_steps, n_layers, dropout, num_heads):
+    def __init__(self, in_channels, hidden_channels, out_channels, pe_dim_in, pe_dim_out, gd_steps, n_layers, dropout, num_heads):
         super().__init__()
+        self.feat_lin = nn.Linear(in_channels, hidden_channels, bias=True)
+        self.pe_lin = nn.Linear(pe_dim_in, pe_dim_out, bias=True)  
         self.gd_steps = gd_steps
-        self.gat = TransformerConv(in_channels+emb_in, out_channels, heads=num_heads, bias = True) # concat features + embeddings
+        self.transformer = GraphTransformer(hidden_channels+pe_dim_out, hidden_channels, out_channels, n_layers, dropout, num_heads) # concat features + embeddings
+
         layers = []
         
         for _ in range(gd_steps):
-            layers.append((GD_Block(emb_in, emb_in), 'x, edge_index, edge_index_2, Q, mask -> x'))
+            layers.append((GD_Block(pe_dim_in, pe_dim_in), 'x, edge_index, edge_index_2, Q, mask -> x'))
         self.gd = Sequential('x, edge_index, edge_index_2, Q, mask', [layer for layer in layers])
         
     def encode(self, x_feat, x_init, edge_index, edge_index_2, Q, mask):
-        x_emb = self.gd(x_init, edge_index, edge_index_2, Q, mask.nonzero().t().contiguous())
-        x = torch.cat([x_feat, x_emb], dim=1)
-        out = self.gat(x, edge_index)
-        return out, x_emb
+        x_feat=self.feat_lin(x_feat)
+        x_pe = self.gd(x_init, edge_index, edge_index_2, Q, mask.nonzero().t().contiguous())
+        x_pe = self.pe_lin(x_pe)
+        x = torch.concatenate((x_feat, x_pe), axis=1)
+        
+        out = self.transformer(x, edge_index)
+        return out, x_pe
 
     def decode(self, z, edge_label_index):
         return (z[edge_label_index[0]] * z[edge_label_index[1]]).sum(dim=-1)
@@ -193,9 +199,9 @@ def train_link_prediction_GAT_e2e(train_data, val_data, test_data, edge_index_2,
             final_test_auc = test_auc
     return model
 
-def train_link_prediction_Transformer_e2e(train_data, val_data, test_data, edge_index_2, Q, mask, feat_dim, emb_dim, gd_steps: int = 20, epochs: int = 101): 
+def train_link_prediction_Transformer_e2e(train_data, val_data, test_data, edge_index_2, Q, mask, feat_dim, emb_dim, gd_steps: int = 20, epochs: int = 301): 
     device = "cuda"
-    model = GLASELinkPredictionTransformer(feat_dim, emb_dim, 128, 64, gd_steps,n_layers=3, dropout=0.5, num_heads=2).to(device)
+    model = GLASELinkPredictionTransformer(feat_dim, 64, 32, emb_dim, 8, gd_steps, n_layers=3, dropout=0.5, num_heads=4).to(device)
     optimizer = torch.optim.Adam(params=model.parameters(), lr=0.01)
     criterion = torch.nn.BCEWithLogitsLoss()
     best_val_auc = final_test_auc = 0

@@ -109,6 +109,7 @@ def link_prediction_GAT(edge_index, edge_index_2, Q, mask, inverted_mask_matrix,
     ])
 
     train_data, val_data, test_data = transform(data)
+    data = data.to('cuda')
     
     ## GCN    
     x_train = train_data.x
@@ -189,45 +190,58 @@ def link_prediction_Transformer(edge_index, edge_index_2, Q, mask, inverted_mask
     x_val = val_data.x
     x_test = test_data.x
     
-    model_1 = train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim)
+    model_1 = train_link_prediction(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim)
 
     ## Predict on entire masked graph
     x_eval = data.x
     acc_gcn = eval_link_prediction(x_eval, data.edge_index, model_1, adj_matrix, inverted_mask_matrix)
 
     ## ASE 
-    x_train = torch.concatenate((train_data.x, train_data.x_ase), axis=1)
-    x_val = torch.concatenate((val_data.x, val_data.x_ase), axis=1)
-    x_test = torch.concatenate((test_data.x, test_data.x_ase), axis=1)
+    # x_train = torch.concatenate((train_data.x, train_data.x_ase), axis=1)
+    # x_val = torch.concatenate((val_data.x, val_data.x_ase), axis=1)
+    # x_test = torch.concatenate((test_data.x, test_data.x_ase), axis=1)
+    x_train = train_data.x, train_data.x_ase
+    x_val = val_data.x, val_data.x_ase
+    x_test = test_data.x, test_data.x_ase
     
-    model_2 = train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim+d)
+    
+    model_2 = train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim, pe_dim=d)
 
     ## Predict on entire masked graph
-    x_eval = torch.concatenate((data.x, data.x_ase), axis=1)
+    # x_eval = torch.concatenate((data.x, data.x_ase), axis=1)
+    x_eval = data.x, data.x_ase
     acc_ase = eval_link_prediction(x_eval, data.edge_index, model_2, adj_matrix, inverted_mask_matrix)
     
     
     ## GD-GRDPG
-    x_train = torch.concatenate((train_data.x, train_data.x_grdpg), axis=1)
-    x_val = torch.concatenate((val_data.x, val_data.x_grdpg), axis=1)
-    x_test = torch.concatenate((test_data.x, test_data.x_grdpg), axis=1)
+    # x_train = torch.concatenate((train_data.x, train_data.x_grdpg), axis=1)
+    # x_val = torch.concatenate((val_data.x, val_data.x_grdpg), axis=1)
+    # x_test = torch.concatenate((test_data.x, test_data.x_grdpg), axis=1)
+    x_train = train_data.x, train_data.x_grdpg
+    x_val = val_data.x, val_data.x_grdpg
+    x_test = test_data.x, test_data.x_grdpg
 
-    model_3 = train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim+d)
+    model_3 = train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim, pe_dim=d)
     
     ## Predict on entire masked graph
-    x_eval = torch.concatenate((data.x, data.x_grdpg), axis=1)
+    # x_eval = torch.concatenate((data.x, data.x_grdpg), axis=1)
+    x_eval = data.x, data.x_grdpg
     acc_grdpg = eval_link_prediction(x_eval, data.edge_index, model_3, adj_matrix, inverted_mask_matrix)
     
     
     ## GLASE
-    x_train = torch.concatenate((train_data.x, train_data.x_glase), axis=1)
-    x_val = torch.concatenate((val_data.x, val_data.x_glase), axis=1)
-    x_test = torch.concatenate((test_data.x, test_data.x_glase), axis=1)
+    # x_train = torch.concatenate((train_data.x, train_data.x_glase), axis=1)
+    # x_val = torch.concatenate((val_data.x, val_data.x_glase), axis=1)
+    # x_test = torch.concatenate((test_data.x, test_data.x_glase), axis=1)
+    x_train = train_data.x, train_data.x_glase
+    x_val = val_data.x, val_data.x_glase
+    x_test = test_data.x, test_data.x_glase
     
-    model_4 = train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim+d)       
+    model_4 = train_link_prediction_Transformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim, pe_dim=d)       
 
     ## Predict on entire masked graph
-    x_eval = torch.concatenate((data.x, data.x_glase), axis=1)
+    # x_eval = torch.concatenate((data.x, data.x_glase), axis=1)
+    x_eval = data.x, data.x_glase
     acc_glase = eval_link_prediction(x_eval, data.edge_index, model_4, adj_matrix, inverted_mask_matrix)
     
     if with_e2e:
@@ -241,7 +255,8 @@ def link_prediction_Transformer(edge_index, edge_index_2, Q, mask, inverted_mask
         return model_1, model_2, model_3, model_4, acc_gcn, acc_ase, acc_grdpg, acc_glase
     
 
-def link_prediction_GraphTransformer(edge_index, edge_index_2, Q, mask, inverted_mask_matrix, data, feat_dim: int, d: int = 4, gd_steps: int = 20, with_e2e: bool = True):
+def link_prediction_GraphTransformer(edge_index, edge_index_2, Q, mask, inverted_mask_matrix, data, feat_dim: int, d: int = 4, gd_steps: int = 20, with_e2e: bool = True,
+                                     epochs = 101, output_dim= 32, pe_out_dim= 8, n_layers= 3, dropout=0.5, num_heads=4, batch_norm=True, lr=0.01):
 
     num_nodes = mask.shape[0]
     adj_matrix = to_dense_adj(edge_index.to('cpu'), max_num_nodes=num_nodes).squeeze(0)
@@ -267,7 +282,6 @@ def link_prediction_GraphTransformer(edge_index, edge_index_2, Q, mask, inverted
     ## Predict on entire masked graph
     x_eval = data.x
     acc_gcn = eval_link_prediction(x_eval, data.edge_index, model_1, adj_matrix, inverted_mask_matrix)
-
     ## ASE 
     # x_train = torch.concatenate((train_data.x, train_data.x_ase), axis=1)
     # x_val = torch.concatenate((val_data.x, val_data.x_ase), axis=1)
@@ -277,13 +291,14 @@ def link_prediction_GraphTransformer(edge_index, edge_index_2, Q, mask, inverted
     x_val = val_data.x, val_data.x_ase
     x_test = test_data.x, test_data.x_ase
     
-    model_2 = train_link_prediction_GraphTransformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim, pe_dim=d)
-
+    
+    
+    model_2 = train_link_prediction_GraphTransformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim, pe_dim=d, epochs = epochs, 
+                                                     output_dim= output_dim, pe_out_dim= pe_out_dim, n_layers= n_layers, dropout=dropout, num_heads=num_heads, batch_norm=batch_norm, lr=lr)
     ## Predict on entire masked graph
     # x_eval = torch.concatenate((data.x, data.x_ase), axis=1)
     x_eval = data.x, data.x_ase
     acc_ase = eval_link_prediction(x_eval, data.edge_index, model_2, adj_matrix, inverted_mask_matrix)
-    
     
     ## GD-GRDPG
     # x_train = torch.concatenate((train_data.x, train_data.x_grdpg), axis=1)
@@ -294,13 +309,13 @@ def link_prediction_GraphTransformer(edge_index, edge_index_2, Q, mask, inverted
     x_test = test_data.x, test_data.x_grdpg
     
 
-    model_3 = train_link_prediction_GraphTransformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim, pe_dim=d)
+    model_3 = train_link_prediction_GraphTransformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim, pe_dim=d,epochs = epochs, 
+                                                     output_dim= output_dim, pe_out_dim= pe_out_dim, n_layers= n_layers, dropout=dropout, num_heads=num_heads, batch_norm=batch_norm, lr=lr)
     
     ## Predict on entire masked graph
     # x_eval = torch.concatenate((data.x, data.x_grdpg), axis=1)
     x_eval = data.x, data.x_grdpg
     acc_grdpg = eval_link_prediction(x_eval, data.edge_index, model_3, adj_matrix, inverted_mask_matrix)
-    
     
     ## GLASE
     # x_train = torch.concatenate((train_data.x, train_data.x_glase), axis=1)
@@ -311,7 +326,8 @@ def link_prediction_GraphTransformer(edge_index, edge_index_2, Q, mask, inverted
     x_val = val_data.x, val_data.x_glase
     x_test = test_data.x, test_data.x_glase
     
-    model_4 = train_link_prediction_GraphTransformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim, pe_dim=d)   
+    model_4 = train_link_prediction_GraphTransformer(x_train, x_val, x_test, train_data, val_data, test_data, input_dim=feat_dim, pe_dim=d,epochs = epochs, 
+                                                     output_dim= output_dim, pe_out_dim= pe_out_dim, n_layers= n_layers, dropout=dropout, num_heads=num_heads, batch_norm=batch_norm, lr=lr)   
 
     ## Predict on entire masked graph
     # x_eval = torch.concatenate((data.x, data.x_glase), axis=1)
@@ -524,7 +540,55 @@ def link_prediction_onu_Transformer(year: int = 2018, d: int = 4, unknown_countr
     #return best_model_1, best_model_2, best_model_3, best_model_4, acc_gcn, acc_ase, acc_grdpg, acc_glase, selected_resolutions
 
 
+def link_prediction_onu_GraphTransformer(year: int = 2018, d: int = 4, unknown_countries: List[str] = ['FRA', 'SUD'], mask_threshold: float = 0.7, random_features: bool = False, iter: int =1, with_e2e: bool = False):
+    votes_df = load_un_dataset('data/UNVotes-1.csv', unknown_votes=True)
+    
+    all_graphs = create_un_graphs(votes_df[votes_df.year==year])
+    
+    adj_matrix, country_indexes, res_indexes, unknown_edges, features, mask_nodes, mask, selected_resolutions, inverted_mask_matrix, mask_unknown = process_un_graph_2(all_graphs, mask_countries=unknown_countries, mask_threshold=mask_threshold) 
 
+    # print(selected_resolutions)
+    
+    num_nodes = adj_matrix.shape[0]
+    edge_index = torch.tensor(adj_matrix).nonzero().t().contiguous()
+    
+    x_ase, x_grdpg, x_glase, masked_edge_index, edge_index_2, Q = generate_embeddings(adj_matrix, mask, d)
+    Q = Q.to('cuda')
+    edge_index_2 = edge_index_2.to('cuda')
+    mask = mask.to('cuda')
+    
+    if random_features:
+        torch.manual_seed(42)
+        random_features=torch.rand([num_nodes, 12])
+        data = Data(x=random_features.float(), x_init=x_ase, x_ase=x_ase, x_glase=x_glase, x_grdpg=x_grdpg, edge_index=masked_edge_index)
+    else:
+        data = Data(x=features.float(), x_init=x_ase, x_ase=x_ase, x_glase=x_glase, x_grdpg=x_grdpg, edge_index=masked_edge_index)
+
+    acc_gcn_array = []
+    acc_ase_array = []
+    acc_grdpg_array = []
+    acc_glase_array = []
+    acc_glase_e2e_array = []
+    
+    for i in range(iter):
+        if with_e2e:
+            model_1, model_2, model_3, model_4, model_5, acc_gcn, acc_ase, acc_grdpg, acc_glase, acc_glase_e2e = link_prediction_GraphTransformer(edge_index, edge_index_2, Q, mask, inverted_mask_matrix, data, 12, d, 5, with_e2e=with_e2e, epochs = 101, output_dim= 32, pe_out_dim= 8, n_layers= 3, dropout=0.5, num_heads=4, batch_norm=False, lr=0.001)
+            acc_gcn_array.append(acc_gcn.numpy().item())
+            acc_ase_array.append(acc_ase.numpy().item())
+            acc_grdpg_array.append(acc_grdpg.numpy().item())
+            acc_glase_array.append(acc_glase.numpy().item())
+            acc_glase_e2e_array.append(acc_glase_e2e.numpy().item())
+        else:
+            model_1, model_2, model_3, model_4, acc_gcn, acc_ase, acc_grdpg, acc_glase = link_prediction_GraphTransformer(edge_index, edge_index_2, Q, mask, inverted_mask_matrix, data, 12, d, 5, with_e2e=with_e2e)
+            acc_gcn_array.append(acc_gcn.numpy().item())
+            acc_ase_array.append(acc_ase.numpy().item())
+            acc_grdpg_array.append(acc_grdpg.numpy().item())
+            acc_glase_array.append(acc_glase.numpy().item())            
+            
+    if with_e2e:
+        return acc_gcn_array, acc_ase_array, acc_grdpg_array, acc_glase_array, acc_glase_e2e_array, selected_resolutions
+    else:
+        return acc_gcn_array, acc_ase_array, acc_grdpg_array, acc_glase_array, selected_resolutions
 
     # ## Calculate Embeddings
     # ## ASE 

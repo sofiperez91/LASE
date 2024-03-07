@@ -5,7 +5,7 @@ import argparse
 import torch
 import torch.nn as nn
 from torch_geometric.utils import to_dense_adj, stochastic_blockmodel_graph, from_networkx
-from models.glase_classifier import gLASE_e2e_GAT
+from models.glase_classifier import gLASE_e2e_GAT, gLASE_e2e_Transformer
 import numpy as np
 import time
 import math
@@ -98,7 +98,7 @@ for iter in range(10):
     val_index = data.val_idx[:,iter]
     test_index = data.test_idx[:,iter]
 
-    model = gLASE_e2e_GAT(feature_dim, embedding_dim, hidden_dim, h_embedding_dim,output_dim, n_layers, dropout1, dropout2, gd_steps, num_heads=1)
+    model = gLASE_e2e_Transformer(feature_dim, embedding_dim, hidden_dim, h_embedding_dim,output_dim, n_layers, dropout1, dropout2, gd_steps, num_heads=1)
     model.to(device)    
 
     ## Initialization
