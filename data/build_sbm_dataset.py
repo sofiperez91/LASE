@@ -53,8 +53,8 @@ elif mode == 'subgraphs':
 
     dropout = config[dataset]['dropout']
     ORIGINAL_GRAPH = f'{dataset}_original_graph.pkl'
-    TRAIN_DATA_FILE=f'{dataset}_train_0{dropout}.pkl'
-    VAL_DATA_FILE=f'{dataset}_val_0{dropout}.pkl'
+    TRAIN_DATA_FILE=f'{dataset}_0{dropout}_train.pkl'
+    VAL_DATA_FILE=f'{dataset}_0{dropout}_val_.pkl'
 
     edge_index = stochastic_blockmodel_graph(n, p)
     with open(ORIGINAL_GRAPH, 'wb') as f:

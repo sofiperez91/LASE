@@ -1,8 +1,9 @@
+import torch
 import torch.nn as nn
 from torch_geometric.nn import TAGConv, Sequential
-from models.Transformer_Block import Transformer_Block
-from typing import Optional
 from torch_geometric.utils import to_dense_adj
+
+from models.Transformer_Block import Transformer_Block
 
 class LaseBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -40,3 +41,18 @@ class LASE(nn.Module):
         x = input
         x = self.gd(x, edge_index, edge_index_2, mask)        
         return x
+
+    def init_lase(self, lr, in_channels):
+        for step in range(self.gd_steps):
+            # TAGConv
+            self.gd[step].gcn.lins[0].weight.data = torch.eye(in_channels)
+            self.gd[step].gcn.lins[0].weight.requires_grad = False
+            self.gd[step].gcn.lins[1].weight.data = torch.nn.init.xavier_uniform_(self.gd[step].gcn.lins[1].weight)*lr
+
+            # TransformerBlock
+            self.gd[step].gat.lin2.weight.data = lr*torch.nn.init.xavier_uniform_(self.gd[step].gat.lin2.weight.data)
+
+            self.gd[step].gat.lin3.weight.data = torch.eye(in_channels)
+            self.gd[step].gat.lin3.weight.requires_grad = False
+            self.gd[step].gat.lin4.weight.data = torch.eye(in_channels)
+            self.gd[step].gat.lin4.weight.requires_grad = False

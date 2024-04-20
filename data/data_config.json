@@ -34,6 +34,18 @@
         "train_samples": 800,
         "mode": "simple"
     },
+    "sbm3_unbalanced_positive_2": {
+        "d": 3,
+        "n": [120, 80, 40],
+        "p": [
+                [0.9, 0.2, 0.1],
+                [0.2, 0.6, 0.2],
+                [0.1, 0.2, 0.7]
+            ],
+        "total_samples": 1000, 
+        "train_samples": 800,
+        "mode": "simple"
+    },
     "sbm3_unbalanced_positive_subgraphs": {
         "d": 3,
         "n": [6000, 4000, 2000],
@@ -88,7 +100,7 @@
         "total_samples": 1000,
         "train_samples": 800,
         "mode": "subgraphs",
-        "dropout": 85
+        "dropout": 80
     },
     "sbm10_unbalanced_positive": {
         "d": 10,
