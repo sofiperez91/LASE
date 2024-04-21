@@ -164,7 +164,6 @@ saved_models/
 local/
 *.pkl
 data/dataset/*
-*.txt
 
 notebooks/data/Cora/*
 *.csv

@@ -205,7 +205,7 @@ tuples = [tuple(lst) for lst in q_array]
 count = Counter(tuples)
 most_common_element, max_frequency = count.most_common(1)[0]
 
-q = torch.tensor(most_common_element)
+q = torch.tensor(most_common_element).float()
 
 with open(Q_FILE, 'wb') as f:
     pickle.dump(q, f)

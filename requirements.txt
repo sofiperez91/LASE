@@ -1,0 +1,7 @@
+matplotlib
+numpy
+torchaudio
+torch
+torchvision
+torch_geometric
+seaborn

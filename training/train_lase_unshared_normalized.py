@@ -89,8 +89,6 @@ for epoch in range(epochs):
         ## Initialization x
         if init == 'random':
             x = batch.x
-        elif init == 'glase_init':
-            x = batch.x_init
         elif init == 'ones':
             x = torch.ones((num_nodes, d)).to(device)
 
@@ -147,8 +145,6 @@ for epoch in range(epochs):
         ## Initialization x
         if init == 'random':
             x = batch.x
-        elif init == 'glase_init':
-            x = batch.x_init
         elif init == 'ones':
             x = torch.ones((num_nodes, d)).to(device)
 
