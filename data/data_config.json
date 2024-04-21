@@ -34,7 +34,7 @@
         "train_samples": 800,
         "mode": "simple"
     },
-    "sbm3_unbalanced_positive_2": {
+    "sbm3_unbalanced_positive_v2": {
         "d": 3,
         "n": [120, 80, 40],
         "p": [
