@@ -44,16 +44,17 @@ n = config[dataset]['n']
 num_nodes = np.sum(n)
 
 if config[dataset]['mode'] == "simple":
-    MODEL_FILE=f'../saved_models/test/glase_{dataset}_d{d}_normalized_{init}_{gd_steps}steps.pt'
-    TRAIN_DATA_FILE=f'../data/{dataset}_train.pkl'
-    VAL_DATA_FILE=f'../data/{dataset}_val.pkl'
+    MODEL_FILE = f'../saved_models/test/glase_{dataset}_d{d}_normalized_{init}_{gd_steps}steps.pt'
+    TRAIN_DATA_FILE = f'../data/{dataset}_train.pkl'
+    VAL_DATA_FILE = f'../data/{dataset}_val.pkl'
+    Q_FILE = f'../data/{dataset}_q_file.pkl'
 
 elif config[dataset]['mode'] == "subgraphs":
     dropout = config[dataset]['dropout']
-    MODEL_FILE=f'../saved_models/test/glase_{dataset}_0{dropout}_d{d}_normalized_{init}_{gd_steps}steps.pt'
-    TRAIN_DATA_FILE=f'../data/{dataset}_0{dropout}_train.pkl'
-    VAL_DATA_FILE=f'../data/{dataset}_0{dropout}_val.pkl'
-
+    MODEL_FILE = f'../saved_models/test/glase_{dataset}_0{dropout}_d{d}_normalized_{init}_{gd_steps}steps.pt'
+    TRAIN_DATA_FILE = f'../data/{dataset}_0{dropout}_train.pkl'
+    VAL_DATA_FILE = f'../data/{dataset}_0{dropout}_val.pkl'
+    Q_FILE = f'../data/{dataset}_0{dropout}_q_file.pkl'
 
 model = gLASE(d,d, gd_steps)
 model.init_lase(lr)
@@ -92,6 +93,9 @@ most_common_element, max_frequency = count.most_common(1)[0]
 q = torch.tensor(most_common_element).float()
 Q=torch.diag(q).to(device)
 print('Q=',Q)
+
+with open(Q_FILE, 'wb') as f:
+    pickle.dump(q, f)
 
 train_loss_epoch=[]
 val_loss_epoch=[]
