@@ -10,8 +10,8 @@
 - CUDA 12.0 
 
 ## Setup
+Clone repo and create a dedicated Python environment:
 ```
-# inside qa folder
 python -m venv lase
 source lase/bin/activate
 pip install -r requirements.txt
