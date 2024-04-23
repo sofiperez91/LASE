@@ -1,12 +1,12 @@
-import torch
-from torch_geometric.utils import to_dense_adj
-
 import sys
 sys.path.append("../")
+
+import torch
+from torch_geometric.utils import to_dense_adj
+import torch_geometric.transforms as T
+
 from models.link_prediction import train_link_prediction, eval_link_prediction, train_link_prediction_GAT, train_link_prediction_Transformer, train_link_prediction_GraphTransformer
 from models.glase_e2e_link_prediction import train_link_prediction_e2e, eval_link_prediction_e2e, train_link_prediction_GAT_e2e, train_link_prediction_Transformer_e2e, train_link_prediction_GraphTransformer_e2e
-
-import torch_geometric.transforms as T
 
 
 def link_prediction(edge_index, edge_index_2, Q, mask, inverted_mask_matrix, data, feat_dim: int, d: int = 4, gd_steps: int = 20, with_e2e: bool = True):
@@ -73,7 +73,6 @@ def link_prediction(edge_index, edge_index_2, Q, mask, inverted_mask_matrix, dat
     
     if with_e2e:
         ## GLASE E2E
-        
         model_5 = train_link_prediction_e2e(train_data, val_data, test_data, edge_index_2, Q, mask, feat_dim, d, gd_steps)
         acc_glase_e2e = eval_link_prediction_e2e(data.x, data.x_init, data.edge_index, edge_index_2, Q, mask, model_5, adj_matrix, inverted_mask_matrix)
         
@@ -305,4 +304,3 @@ def link_prediction_GraphTransformer(edge_index, edge_index_2, Q, mask, inverted
         return model_1, model_2, model_3, model_4, model_5, acc_gcn, acc_ase, acc_grdpg, acc_glase, acc_glase_e2e
     else: 
         return model_1, model_2, model_3, model_4, acc_gcn, acc_ase, acc_grdpg, acc_glase
-
