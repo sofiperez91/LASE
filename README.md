@@ -1,3 +1,4 @@
+![LASE](docs/imgs/graph_networks.png)
 [![License](https://img.shields.io/github/license/sofiperez91/LASE)](LICENSE)
 
 # Learned Adyacency Spectral Embeddings (LASE)
