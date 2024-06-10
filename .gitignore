@@ -163,7 +163,7 @@ cython_debug/
 saved_models/
 local/
 *.pkl
-data/dataset/*
+data/real_dataset/*
 
 notebooks/data/Cora/*
 *.csv

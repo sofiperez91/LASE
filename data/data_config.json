@@ -10,6 +10,39 @@
         "train_samples": 800,
         "mode": "simple"
     },
+    "sbm2_unbalanced_positive_2": {
+        "d": 2,
+        "n": [80, 20],
+        "p": [
+                [0.8, 0.2],
+                [0.2, 0.4]
+            ],
+        "total_samples": 1000,
+        "train_samples": 800,
+        "mode": "simple"
+    },
+    "sbm2_unbalanced_positive_3": {
+        "d": 2,
+        "n": [60, 40],
+        "p": [
+                [0.7, 0.1],
+                [0.1, 0.9]
+            ],
+        "total_samples": 1000,
+        "train_samples": 800,
+        "mode": "simple"
+    },
+    "sbm2_unbalanced_positive_mixed": {
+        "d": 2,
+        "n": [60, 40],
+        "p": [
+                [0.7, 0.1],
+                [0.1, 0.9]
+            ],
+        "total_samples": 3000,
+        "train_samples": 2400,
+        "mode": "simple"
+    },
     "sbm3_sim_positive": {
         "d": 3,
         "n": [50, 50, 50],
@@ -72,6 +105,21 @@
         "total_samples": 1000,
         "train_samples": 800,
         "mode": "simple"
+    },
+    "sbm5_unbalanced_positive_subgraphs": {
+        "d": 5,
+        "n": [4000, 2000, 3600, 2400, 2000],
+        "p": [
+                [0.9, 0.1, 0.2, 0.2, 0.1],
+                [0.1, 0.8, 0.1, 0.1, 0.2],
+                [0.2, 0.1, 0.7, 0.2, 0.1],
+                [0.2, 0.1, 0.2, 0.8, 0.2],
+                [0.1, 0.2, 0.1, 0.2, 0.9]
+            ],
+        "total_samples": 1000,
+        "train_samples": 800,
+        "mode": "subgraphs",
+        "dropout": 95
     },
     "sbm5_unbalanced_negative": {
         "d": 5,

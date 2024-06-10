@@ -128,7 +128,7 @@ To train the GAT-based node classifier use the following:
 
 ```
 cd ~/LASE/training
-python train_glase_dataset_embeddings.py --dataset='cora' --mask='FULL' --d=6 --glase_steps=5
+python train_glase_classifier.py --dataset='cora' --mask='FULL' --d=6 --glase_steps=5
 ```
 
 Options include:

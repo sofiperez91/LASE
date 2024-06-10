@@ -40,9 +40,9 @@ Q_FILE = f'../data/{dataset}_q.pkl'
 DATASET_FILE = f'../data/{dataset}_dataset.pkl'
 MASK_FILE = f'../data/{dataset}_mask_{mask}.pkl'
 
+GLASE_XINIT = f'../data/{dataset}_glase_e2e_xinit_d{d}_{gd_steps}steps_{mask}.pkl'
 GLASE_MODEL_FILE=f'../saved_models/test/{dataset}_gat_classifier_glase_e2e_d{d}_{mask}.pt'
 E2E_RESULTS = f'./results/{dataset}/{dataset}_glase_e2e_results_{mask}_d{d}.pkl'
-
 
 
 ## LOAD DATASET 
@@ -83,6 +83,9 @@ with open(MASK_FILE, 'rb') as f:
 mask = mask.to(device)
 
 x = get_x_init(num_nodes, d, 0, math.pi/2, 0, math.pi/2).to(device)
+
+with open(GLASE_XINIT, 'wb') as f:
+    pickle.dump(x, f)
 
 acc_glase_test = []
 for iter in range(total_iter):

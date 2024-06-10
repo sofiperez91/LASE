@@ -53,7 +53,7 @@ train_loader = DataLoader(df_train, batch_size=1, shuffle = True)
 val_loader = DataLoader(df_val, batch_size=1, shuffle = False)   
 
 device = 'cuda'
-epochs = 1000
+epochs = 300
 lr=1e-3
 
 Q = torch.diag(q[:d]).to(device)
@@ -94,8 +94,8 @@ for epoch in range(epochs):
             mask_matrix = batch.sub_mask_M04
         elif mask == 'M02':
             mask_matrix = batch.sub_mask_M02
-        x_init = get_x_init(batch.num_nodes, d, 0, math.pi/2, 0, math.pi/2).to(device)
-        out = model(x_init, batch.edge_index, batch.edge_index_2, Q, mask_matrix)
+
+        out = model(batch.x_init, batch.edge_index, batch.edge_index_2, Q, mask_matrix)
         loss = torch.norm((out@Q@out.T - to_dense_adj(batch.edge_index).squeeze(0))*to_dense_adj(mask_matrix).squeeze(0))
         loss.backward() 
         optimizer.step() 
@@ -125,8 +125,7 @@ for epoch in range(epochs):
         elif mask == 'M02':
             mask_matrix = batch.sub_mask_M02
 
-        x_init = get_x_init(batch.num_nodes, d, 0, math.pi/2, 0, math.pi/2).to(device)
-        out = model(x_init, batch.edge_index, batch.edge_index_2, Q, mask_matrix)
+        out = model(batch.x_init, batch.edge_index, batch.edge_index_2, Q, mask_matrix)
         loss = torch.norm((out@Q@out.T - to_dense_adj(batch.edge_index).squeeze(0))* to_dense_adj(mask_matrix).squeeze(0))
 
         val_loss_step.append(loss.detach().to('cpu').numpy())

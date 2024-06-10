@@ -97,6 +97,24 @@ if model == 'cgd':
 
     with open(f'./results/coord_gd_performance_{dataset}.pkl', 'wb') as f:
         pickle.dump(cgd_exec_time, f)
+
+if model == 'gd_10':
+    gd_exec_time = np.zeros((len(nodes),2))
+
+    for i, num_nodes in enumerate(nodes):
+        print(num_nodes)
+        n = n_array[i]
+        x = torch.rand((num_nodes, d)).to(device)
+        edge_index = stochastic_blockmodel_graph(n, p).to(device)
+        mask = (torch.ones([num_nodes,num_nodes],)-torch.eye(num_nodes)).nonzero().t().contiguous().to(device)
+        tol = 0.001
+        max_iter=10
+        best_time, mean_time, std_time = measure_execution_time(RDPG_GD_Armijo, x, edge_index, mask, tol, max_iter)
+        gd_exec_time[i]=[mean_time, std_time]
+        print(f"Best execution time over 5 repetitions: {best_time:.8f} seconds")
+
+    with open(f'./results/gd5_performance_{dataset}.pkl', 'wb') as f:
+        pickle.dump(gd_exec_time, f)
         
 
 if model == 'LASE_ER05':

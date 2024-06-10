@@ -26,6 +26,7 @@ parser.add_argument('--epochs', type=int, default=200)
 parser.add_argument('--init', type=str, default='random')
 parser.add_argument('--att', type=str, default='FULL')
 
+
 args = parser.parse_args()
 dataset = args.dataset
 gd_steps = args.gd_steps
@@ -39,20 +40,20 @@ with open('../data/data_config.json', 'r') as file:
     config = json.load(file)
 
 device = 'cuda'
-lr = 1e-3
+lr = 1e-4
 d = config[dataset]['d']
 n = config[dataset]['n']
 num_nodes = np.sum(n)
 
 if config[dataset]['mode'] == "simple":
-    MODEL_FILE=f'../saved_models/test/lase_{dataset}_d{d}_normalized_{init}_{gd_steps}steps_{att}.pt'
-    TRAIN_DATA_FILE=f'../data/{dataset}_train.pkl'
-    VAL_DATA_FILE=f'../data/{dataset}_val.pkl'
+    MODEL_FILE=f'../saved_models/lase_{dataset}_d{d}_normalized_{init}_{gd_steps}steps_{att}.pt'
+    TRAIN_DATA_FILE=f'../data/synthetic_dataset/sbm/{dataset}_train.pkl'
+    VAL_DATA_FILE=f'../data/synthetic_dataset/sbm/{dataset}_val.pkl'
 elif config[dataset]['mode'] == "subgraphs":
     dropout = config[dataset]['dropout']
-    MODEL_FILE=f'../saved_models/test/lase_{dataset}_0{dropout}_d{d}_normalized_{init}_{gd_steps}steps_{att}.pt'
-    TRAIN_DATA_FILE=f'../data/{dataset}_0{dropout}_train.pkl'
-    VAL_DATA_FILE=f'../data/{dataset}_0{dropout}_val.pkl'
+    MODEL_FILE=f'../saved_models/lase_{dataset}_0{dropout}_d{d}_normalized_{init}_{gd_steps}steps_{att}.pt'
+    TRAIN_DATA_FILE=f'../data/synthetic_dataset/sbm/{dataset}_0{dropout}_train.pkl'
+    VAL_DATA_FILE=f'../data/synthetic_dataset/sbm/{dataset}_0{dropout}_val.pkl'
 
 
 model = LASE(d,d, gd_steps)

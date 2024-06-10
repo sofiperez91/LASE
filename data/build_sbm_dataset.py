@@ -33,8 +33,8 @@ df_val = []
 
 if mode == 'simple':
 
-    TRAIN_DATA_FILE=f'{dataset}_train.pkl'
-    VAL_DATA_FILE=f'{dataset}_val.pkl'
+    TRAIN_DATA_FILE=f'./synthetic_dataset/sbm/{dataset}_train.pkl'
+    VAL_DATA_FILE=f'./synthetic_dataset/sbm/{dataset}_val.pkl'
 
     for j in range(total_samples):
         x = torch.rand((num_nodes, d))
@@ -52,9 +52,9 @@ if mode == 'simple':
 elif mode == 'subgraphs':
 
     dropout = config[dataset]['dropout']
-    ORIGINAL_GRAPH = f'{dataset}_original_graph.pkl'
-    TRAIN_DATA_FILE=f'{dataset}_0{dropout}_train.pkl'
-    VAL_DATA_FILE=f'{dataset}_0{dropout}_val_.pkl'
+    ORIGINAL_GRAPH = f'./synthetic_dataset/sbm/{dataset}_original_graph.pkl'
+    TRAIN_DATA_FILE=f'./synthetic_dataset/sbm/{dataset}_0{dropout}_train.pkl'
+    VAL_DATA_FILE=f'./synthetic_dataset/sbm/{dataset}_0{dropout}_val.pkl'
 
     edge_index = stochastic_blockmodel_graph(n, p)
     with open(ORIGINAL_GRAPH, 'wb') as f:
