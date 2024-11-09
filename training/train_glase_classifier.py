@@ -31,15 +31,15 @@ d = args.d
 gd_steps = args.glase_steps
 total_iter = args.iter
 
-DATASET_FILE = f'../data/{dataset}_dataset.pkl'
-MASK_FILE = f'../data/{dataset}_mask_{mask}.pkl'
-GLASE_EMBEDDINGS_FILE=f'../data/{dataset}_glase_embeddings_d{d}_{gd_steps}steps_{mask}.pkl'
-Q_FILE = f'../data/{dataset}_q.pkl'
+DATASET_FILE = f'../data/real_dataset/{dataset}_dataset.pkl'
+MASK_FILE = f'../data/real_dataset/{dataset}_mask_{mask}.pkl'
+GLASE_EMBEDDINGS_FILE=f'../data/real_dataset/{dataset}_glase_embeddings_d{d}_{gd_steps}steps_{mask}.pkl'
+Q_FILE = f'../data/real_dataset/{dataset}_q.pkl'
 
 ## RESULT FILES
-MODEL_FILE_FEAT = f'../saved_models/test/{dataset}_gat_classifier_features_d{d}_{mask}.pt'
-MODEL_FILE_ASE = f'../saved_models/test/{dataset}_gat_classifier_ase_d{d}_{mask}.pt'
-MODEL_FILE_GLASE = f'../saved_models/test/{dataset}_gat_classifier_glase_d{d}_{mask}.pt'
+MODEL_FILE_FEAT = f'../saved_models/{dataset}/{dataset}_gat_classifier_features_d{d}_{mask}.pt'
+MODEL_FILE_ASE = f'../saved_models/{dataset}/{dataset}_gat_classifier_ase_d{d}_{mask}.pt'
+MODEL_FILE_GLASE = f'../saved_models/{dataset}/{dataset}_gat_classifier_glase_d{d}_{mask}.pt'
 GLASE_RESULTS = f'./results/{dataset}/{dataset}_glase_GAT_results_{mask}_d{d}.pkl'
 ASE_RESULTS = f'./results/{dataset}/{dataset}_ase_GAT_results_{mask}_d{d}.pkl'
 FEATURE_RESULTS = f'./results/{dataset}/{dataset}_features_GAT_results_{mask}_d{d}.pkl'

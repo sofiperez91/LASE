@@ -5,3 +5,6 @@ torch
 torchvision
 torch_geometric
 seaborn
+graspologic
+pycountry_convert
+future

@@ -171,3 +171,7 @@ notebooks/data/Cora/*
 *.pt
 *.code-workspace
 *.index
+
+env/
+paper/
+*.tar.gz

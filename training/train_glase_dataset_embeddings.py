@@ -33,10 +33,10 @@ mask = args.mask
 d = args.d
 gd_steps = args.glase_steps
 
-MODEL_FILE=f'../saved_models/test/{dataset}_glase_unshared_{gd_steps}steps_d{d}_{mask}.pt'
-TRAIN_DATA_FILE = f'../data/{dataset}_train_subgraphs.pkl'
-VAL_DATA_FILE = f'../data/{dataset}_val_subgraphs.pkl'
-q_file = f'../data/{dataset}_q.pkl'
+MODEL_FILE=f'../saved_models/{dataset}/{dataset}_glase_unshared_{gd_steps}steps_d{d}_{mask}.pt'
+TRAIN_DATA_FILE = f'../data/real_dataset/{dataset}_train_subgraphs.pkl'
+VAL_DATA_FILE = f'../data/real_dataset/{dataset}_val_subgraphs.pkl'
+q_file = f'../data/real_dataset/{dataset}_q.pkl'
 
 
 ## Load data
@@ -96,7 +96,7 @@ for epoch in range(epochs):
             mask_matrix = batch.sub_mask_M02
 
         out = model(batch.x_init, batch.edge_index, batch.edge_index_2, Q, mask_matrix)
-        loss = torch.norm((out@Q@out.T - to_dense_adj(batch.edge_index).squeeze(0))*to_dense_adj(mask_matrix).squeeze(0))
+        loss = torch.norm((out@Q@out.T - to_dense_adj(batch.edge_index, max_num_nodes=batch.num_nodes).squeeze(0))*to_dense_adj(mask_matrix, max_num_nodes=batch.num_nodes).squeeze(0))
         loss.backward() 
         optimizer.step() 
         
@@ -126,7 +126,7 @@ for epoch in range(epochs):
             mask_matrix = batch.sub_mask_M02
 
         out = model(batch.x_init, batch.edge_index, batch.edge_index_2, Q, mask_matrix)
-        loss = torch.norm((out@Q@out.T - to_dense_adj(batch.edge_index).squeeze(0))* to_dense_adj(mask_matrix).squeeze(0))
+        loss = torch.norm((out@Q@out.T - to_dense_adj(batch.edge_index, max_num_nodes=batch.num_nodes).squeeze(0))* to_dense_adj(mask_matrix, max_num_nodes=batch.num_nodes).squeeze(0))
 
         val_loss_step.append(loss.detach().to('cpu').numpy())
         val_loop.set_description(f"Epoch [{epoch}/{epochs}]")
@@ -151,10 +151,10 @@ print(f"Training time: {stop - start}s")
 
 ## GENERATE EMBEDDINGS
 
-DATASET_FILE = f'../data/{dataset}_dataset.pkl'
-Q_FILE = f'../data/{dataset}_q.pkl'
-MASK_FILE = f'../data/{dataset}_mask_{mask}.pkl'
-EMBEDDING_FILE = f'../data/{dataset}_glase_embeddings_d{d}_{gd_steps}steps_{mask}.pkl'
+DATASET_FILE = f'../data/real_dataset/{dataset}_dataset.pkl'
+Q_FILE = f'../data/real_dataset/{dataset}_q.pkl'
+MASK_FILE = f'../data/real_dataset/{dataset}_mask_{mask}.pkl'
+EMBEDDING_FILE = f'../data/real_dataset/{dataset}_glase_embeddings_d{d}_{gd_steps}steps_{mask}.pkl'
 
 with open(DATASET_FILE, 'rb') as f:
     data = pickle.load(f)

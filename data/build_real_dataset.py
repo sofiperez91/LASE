@@ -10,7 +10,7 @@ from collections import Counter
 
 from torch_geometric.utils import to_dense_adj, dropout_node
 from torch_geometric.data import Data
-from torch_geometric.datasets import Planetoid, Amazon, WikipediaNetwork, WebKB
+from torch_geometric.datasets import Planetoid, Amazon, WikipediaNetwork, WebKB, Entities, Airports
 
 from training.get_init import get_x_init
 
@@ -22,39 +22,46 @@ args = parser.parse_args()
 dataset = args.dataset
 d = args.d
 
-Q_FILE = f'{dataset}_q.pkl'
-SUBGRAPH_TRAIN_FILE = f'./{dataset}_train_subgraphs.pkl'
-SUBGRAPH_VAL_FILE = f'./{dataset}_val_subgraphs.pkl'
-DATASET_FILE = f'./{dataset}_dataset.pkl'
-MASK_FULL_FILE = f'./{dataset}_mask_FULL.pkl'
-MASK_08_FILE = f'./{dataset}_mask_M08.pkl'
-MASK_06_FILE = f'./{dataset}_mask_M06.pkl'
-MASK_04_FILE = f'./{dataset}_mask_M04.pkl'
-MASK_02_FILE = f'./{dataset}_mask_M02.pkl'
+Q_FILE = f'./real_dataset/{dataset}_q.pkl'
+SUBGRAPH_TRAIN_FILE = f'./real_dataset/{dataset}_train_subgraphs.pkl'
+SUBGRAPH_VAL_FILE = f'./real_dataset/{dataset}_val_subgraphs.pkl'
+DATASET_FILE = f'./real_dataset/{dataset}_dataset.pkl'
+MASK_FULL_FILE = f'./real_dataset/{dataset}_mask_FULL.pkl'
+MASK_08_FILE = f'./real_dataset/{dataset}_mask_M08.pkl'
+MASK_06_FILE = f'./real_dataset/{dataset}_mask_M06.pkl'
+MASK_04_FILE = f'./real_dataset/{dataset}_mask_M04.pkl'
+MASK_02_FILE = f'./real_dataset/{dataset}_mask_M02.pkl'
 
 # LOAD ORIGINAL GRAPH
 if dataset == 'cora':
-    dataset = Planetoid(root='./real_dataset', name='Cora', split='public', transform=None)
+    dataset = Planetoid(root='./real_dataset/dataset', name='Cora', split='public', transform=None)
     dropout = 0.80
 elif dataset == 'citeseer':
-    dataset = Planetoid(root='./real_dataset', name='Citeseer', split='public', transform=None)
+    dataset = Planetoid(root='./real_dataset/dataset', name='Citeseer', split='public', transform=None)
     dropout = 0.80
 elif dataset == 'amazon':
-    dataset = Amazon(root='./real_dataset/amazon', name = 'Photo')
+    dataset = Amazon(root='./real_dataset/dataset/amazon', name = 'Photo')
     dropout = 0.90
 elif dataset == 'chameleon':
-    dataset = WikipediaNetwork(root='./real_dataset/Chameleon', name='chameleon')
+    dataset = WikipediaNetwork(root='./real_dataset/dataset/Chameleon', name='chameleon')
 elif dataset == 'squirrel':
-    dataset = WikipediaNetwork(root='./real_dataset/Squirrel', name='squirrel')
+    dataset = WikipediaNetwork(root='./real_dataset/dataset/Squirrel', name='squirrel')
 elif dataset == 'crocodile':
-    dataset = WikipediaNetwork(root='./real_dataset/Crocodile', name='crocodile')
+    dataset = WikipediaNetwork(root='./real_dataset/dataset/Crocodile', name='crocodile')
 elif dataset == 'cornell':
-    dataset = WebKB(root='./real_dataset/Cornell', name='Cornell')
+    dataset = WebKB(root='./real_dataset/dataset/Cornell', name='Cornell')
 elif dataset == 'texas':
-    dataset = WebKB(root='./real_dataset/Texas', name='Texas')
+    dataset = WebKB(root='./real_dataset/dataset/Texas', name='Texas')
 elif dataset == 'wisconsin':
-    dataset = WebKB(root='./real_dataset/Wisconsin', name='Wisconsin')
-
+    dataset = WebKB(root='./real_dataset/dataset/Wisconsin', name='Wisconsin')
+elif dataset == 'AIFB':
+    dataset = Entities(root='../data/real_dataset/dataset', name='AIFB', transform=None)
+    dropout = 0.90
+elif dataset == 'USA':
+    dataset = Airports(root='../data/real_dataset/dataset', name='USA', transform=None)
+    dropout = 0.70
+else:
+    raise NotImplementedError
     
 data = dataset[0]
 print("Embedding dimension: ", d) 
