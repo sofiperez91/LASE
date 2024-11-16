@@ -10,7 +10,7 @@ from collections import Counter
 
 from torch_geometric.utils import to_dense_adj, dropout_node
 from torch_geometric.data import Data
-from torch_geometric.datasets import Planetoid, Amazon, WikipediaNetwork, WebKB, Entities, Airports
+from torch_geometric.datasets import Planetoid, Amazon, WikipediaNetwork, WebKB, Entities, Airports, Twitch
 
 from training.get_init import get_x_init
 
@@ -60,6 +60,9 @@ elif dataset == 'AIFB':
 elif dataset == 'USA':
     dataset = Airports(root='../data/real_dataset/dataset', name='USA', transform=None)
     dropout = 0.70
+elif dataset == 'Twitch_ES':
+    dataset = Twitch(root='../data/real_dataset/dataset', name='ES', transform=None)
+    dropout = 0.90
 else:
     raise NotImplementedError
     
