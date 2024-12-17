@@ -22,7 +22,7 @@ from models.bigbird_attention import big_bird_attention
 parser = argparse.ArgumentParser(description='Dataset')
 parser.add_argument('--dataset', type=str, default='sbm2_unbalanced_positive')
 parser.add_argument('--gd_steps', type=int, default=5)
-parser.add_argument('--epochs', type=int, default=200)
+parser.add_argument('--epochs', type=int, default=1000)
 parser.add_argument('--init', type=str, default='random')
 parser.add_argument('--att', type=str, default='FULL')
 
@@ -46,7 +46,11 @@ n = config[dataset]['n']
 num_nodes = np.sum(n)
 
 if config[dataset]['mode'] == "simple":
-    MODEL_FILE=f'../saved_models/lase_{dataset}_d{d}_normalized_{init}_{gd_steps}steps_{att}.pt'
+    MODEL_FILE=f'../saved_models/lase_{dataset}_d{d}_normalized_{init}_{gd_steps}steps_{att}_.pt'
+    TRAIN_DATA_FILE=f'../data/synthetic_dataset/sbm/{dataset}_train.pkl'
+    VAL_DATA_FILE=f'../data/synthetic_dataset/sbm/{dataset}_val.pkl'
+elif config[dataset]['mode'] == "mixed":
+    MODEL_FILE=f'../saved_models/lase_{dataset}_d{d}_normalized_{init}_{gd_steps}steps_{att}_.pt'
     TRAIN_DATA_FILE=f'../data/synthetic_dataset/sbm/{dataset}_train.pkl'
     VAL_DATA_FILE=f'../data/synthetic_dataset/sbm/{dataset}_val.pkl'
 elif config[dataset]['mode'] == "subgraphs":

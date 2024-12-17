@@ -30,6 +30,7 @@ mode = config[dataset]['mode']
 df_train = []
 df_val = []
 
+deltas = np.linspace(-0.09, 0.09, 11)
 
 if mode == 'simple':
 
@@ -48,6 +49,26 @@ if mode == 'simple':
             df_val.append(data)
         if j % 100 == 0:
             print(j)
+
+elif mode == 'mixed':
+    
+    TRAIN_DATA_FILE=f'./synthetic_dataset/sbm/{dataset}_train.pkl'
+    VAL_DATA_FILE=f'./synthetic_dataset/sbm/{dataset}_val.pkl'
+
+    for delta in deltas:
+        for j in range(total_samples):
+            x = torch.rand((num_nodes, d))
+            edge_index = stochastic_blockmodel_graph(n, np.array(p)+delta)
+            edge_index_2 = torch.ones([num_nodes,num_nodes],).nonzero().t().contiguous()
+            mask = (torch.ones([num_nodes,num_nodes],)-torch.eye(num_nodes)).nonzero().t().contiguous()
+            data = Data(x = x, edge_index = edge_index,  edge_index_2=edge_index_2, mask=mask, num_nodes=num_nodes)
+            if j < train_samples:
+                df_train.append(data)
+            else:
+                df_val.append(data)
+            if j % 100 == 0:
+                print(j)
+
 
 elif mode == 'subgraphs':
 

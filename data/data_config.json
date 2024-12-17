@@ -43,6 +43,17 @@
         "train_samples": 2400,
         "mode": "simple"
     },
+    "sbm2_unbalanced_positive_mixed_2": {
+        "d": 2,
+        "n": [70, 30],
+        "p": [
+                [0.9, 0.1],
+                [0.1, 0.5]
+            ],
+        "total_samples": 500,
+        "train_samples": 400,
+        "mode": "mixed"
+    },
     "sbm3_sim_positive": {
         "d": 3,
         "n": [50, 50, 50],
